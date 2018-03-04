@@ -5,8 +5,9 @@ var min = document.getElementById('min');
 var sec = document.getElementById('sec');
 min.value = "00";
 sec.value = "00";
-killFlag = 0;
-pauseFlag = 0;
+var killFlag = 0;
+var pauseFlag = 0;
+var completeFlag = 1;
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -15,8 +16,10 @@ start.addEventListener("click",startPauseTimer);
 reset.addEventListener("click",resetTimer);
 
 async function countdown() {
-  var minutes = parseInt(min.value);
-  var seconds = parseInt(sec.value);
+  var minutes = parseInt(min.value, 10);
+  var seconds = parseInt(sec.value, 10);
+  console.log(minutes + " " + seconds);
+  loop1:
   while(minutes >= 0){
     if(minutes < 10){
       min.value = "0"+minutes;
@@ -25,10 +28,12 @@ async function countdown() {
       if(killFlag == 1){
         min.value = "00";
         sec.value = "00";
+        completeFlag = 0;
         break;
       }
       else if (pauseFlag == 1) {
-        break;
+        completeFlag = 0;
+        break loop1;
       }
       if(seconds < 10){
         sec.value = "0"+seconds;
@@ -40,6 +45,7 @@ async function countdown() {
       seconds -= 1;
     }
     if(minutes == 0){
+      //completeFlag = 0;
       break;
     }
     else{
@@ -52,7 +58,9 @@ async function countdown() {
       }
       seconds = 59;
     }
-
+  }
+  if(completeFlag == 1){
+    start.innerHTML = "Start!";
   }
 }
 
@@ -69,14 +77,16 @@ function startPauseTimer(){
       start.innerHTML = "Pause!";
       killFlag = 0;
       pauseFlag = 0;
-      countdown();
+      completeFlag = 1;
     }
     else{
       console.log("Timer Paused!");
       start.innerHTML = "Start!";
       killFlag = 0;
       pauseFlag = 1;
+      completeFlag = 1;
     }
+    countdown();
   }
 }
 
